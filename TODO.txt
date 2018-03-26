@@ -1,4 +1,5 @@
--Main page
--Video API
--Search bar
--Login, saving with files
+1. Login, saving with files
+2. Main page
+3. Video API
+4. Search bar
+5. Gradle file
