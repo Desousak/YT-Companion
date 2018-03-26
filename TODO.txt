@@ -1,5 +1,5 @@
-1. Login, saving with files
-2. Main page
-3. Video API
-4. Search bar
-5. Gradle file
+1. Login, saving with files (Dan)
+2. Main page (Kevin)
+3. Video API (Leo/Sam)
+4. Search bar (Kevin)
+5. Gradle file 
