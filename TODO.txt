@@ -1,0 +1,4 @@
+-Main page
+-Video API
+-Search bar
+-Login, saving with files
