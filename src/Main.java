@@ -1,13 +1,16 @@
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.awt.event.KeyEvent;
 
 public class Main extends Application {
 
@@ -15,36 +18,52 @@ public class Main extends Application {
         launch(args);
     }
 
-    private BorderPane layout = new BorderPane();
+    private Scene mainScene;
+    private BorderPane mainPane;
+    private BorderPane centerPane;
 
-    @Override
+    private TextField searchField;
+    private MenuBar menuBar;
+    private Menu loginItem;
+    private Menu searchItem;
+    private Menu quitItem;
+
     public void start(Stage primaryStage) {
-        // Neat code to test clearing all the objects (nodes) on the javafx window
-        GridPane editArea = new GridPane();
-        editArea.setPadding(new Insets(100, 100, 100, 100));
-        editArea.setVgap(10);
-        editArea.setHgap(10);
+        centerPane = new BorderPane();
+        mainPane = new BorderPane();
+        searchField = new TextField("Enter your search query here");
+        menuBar = new MenuBar();
+        loginItem = new Menu("Login");
+        searchItem = new Menu("Search");
+        quitItem = new Menu("Quit");
 
-        Label lbl1 = new Label("Testing......... ");
-        editArea.add(lbl1, 0, 1);
+        // Allows the menu to have just one item and also fire
+        searchItem.getItems().add(new MenuItem());
+        searchItem.addEventHandler(Menu.ON_SHOWN, event -> searchItem.hide());
+        searchItem.addEventHandler(Menu.ON_SHOWING, event -> searchItem.fire());
+        searchItem.setOnAction(e -> centerPane.setTop(searchField));
 
-        layout.setCenter(editArea);
+        quitItem.getItems().add(new MenuItem());
+        quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
+        quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
+        quitItem.setOnAction(e -> System.exit(0));
 
-        Button addButton = new Button("KILL ALL OBJECTS");
-        editArea.add(addButton, 10, 10);
-        addButton.setOnAction(new EventHandler<ActionEvent>(){
-            @Override
-            public void handle(ActionEvent event){
-                editArea.getChildren().clear();
 
-                Label lbl2 = new Label("HEY A NEW LABEL!!!");
-                editArea.add(lbl2, 0, 1);
-
+        //Code for the search box to display or hide properly
+        searchField.setOnKeyPressed((event) -> {
+            if(event.getCode() == KeyCode.ESCAPE){
+                centerPane.getChildren().remove(searchField);
             }
         });
 
-        Scene scene = new Scene(layout, 600, 600);
-        primaryStage.setScene(scene);
+        menuBar.getMenus().addAll(loginItem, searchItem, quitItem);
+        mainPane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
+        
+        mainPane.setTop(menuBar);
+        mainPane.setCenter(centerPane);
+        mainScene = new Scene(mainPane,500,200);
+        primaryStage.setScene(mainScene);
         primaryStage.show();
+
     }
 }
