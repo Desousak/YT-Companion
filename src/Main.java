@@ -1,3 +1,4 @@
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -12,14 +13,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 import java.awt.event.KeyEvent;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) { launch(args); }
 
     private Scene mainScene;
     private BorderPane mainPane;
@@ -36,17 +38,24 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         centerPane = new BorderPane();
         mainPane = new BorderPane();
-        searchField = new TextField("Enter your search query here");
+        searchField = new TextField();
+        searchField.setPromptText("Enter your search query here");
         menuBar = new MenuBar();
         loginItem = new Menu("Login");
         searchItem = new Menu("Search");
         quitItem = new Menu("Quit");
-
+        
         // Allows the menu to have just one item and also fire
         searchItem.getItems().add(new MenuItem());
         searchItem.addEventHandler(Menu.ON_SHOWN, event -> searchItem.hide());
         searchItem.addEventHandler(Menu.ON_SHOWING, event -> searchItem.fire());
-        searchItem.setOnAction(e -> centerPane.setTop(searchField));
+        searchItem.setOnAction(e -> {
+            if(centerPane.getTop() == searchField){
+                centerPane.getChildren().remove(searchField);
+            } else {
+                centerPane.setTop(searchField);
+            }
+        });
 
         quitItem.getItems().add(new MenuItem());
         quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
@@ -89,12 +98,26 @@ public class Main extends Application {
         });*/
         centerPane.setLeft(videoList);
 
-
         mainPane.setTop(menuBar);
         mainPane.setCenter(centerPane);
-        mainScene = new Scene(mainPane,500,200);
-        primaryStage.setScene(mainScene);
-        primaryStage.show();
+        mainScene = new Scene(mainPane,700,500);
+
+        //Creates and starts the logo display
+        Stage logoStage = new Stage();
+        new LogoScreen().start(logoStage);
+
+        //Waits then displays the main screen
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(e ->{
+            logoStage.close();
+            primaryStage.setScene(mainScene);
+            primaryStage.initStyle(StageStyle.DECORATED);
+            primaryStage.getIcons().add(new Image("https://cdn1.iconfinder.com/data/icons/logotypes/32/youtube-256.png"));
+            primaryStage.setTitle("YT Companion");
+            primaryStage.show();
+        });
+        pause.play();
+
 
     }
 }
