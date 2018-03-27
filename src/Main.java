@@ -14,14 +14,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.awt.event.KeyEvent;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) { launch(args); }
 
     private Scene mainScene;
+    private BorderPane loadingPane;
     private BorderPane mainPane;
     private BorderPane centerPane;
 
@@ -30,10 +30,13 @@ public class Main extends Application {
     private Menu loginItem;
     private Menu searchItem;
     private Menu quitItem;
+    private Image ytlogo;
+    private ImageView imageLogoView;
     private ListView<String> videoList;
 
 
     public void start(Stage primaryStage) {
+        loadingPane = new BorderPane();
         centerPane = new BorderPane();
         mainPane = new BorderPane();
         searchField = new TextField("Enter your search query here");
@@ -42,6 +45,26 @@ public class Main extends Application {
         searchItem = new Menu("Search");
         quitItem = new Menu("Quit");
 
+        // Loading screen code...................
+        ytlogo = new Image("https://www.youtube.com/yt/about/media/images/brand-resources/icons/YouTube-icon-our_icon.png");
+        imageLogoView = new ImageView();
+        imageLogoView.setImage(ytlogo);
+
+        loadingPane.setCenter(imageLogoView);
+
+        mainScene = new Scene(loadingPane,500,200);
+        primaryStage.setScene(mainScene);
+        primaryStage.show();
+
+        // Times out code for 2 seconds to show logo (loading screen)
+        try {
+            TimeUnit.SECONDS.sleep(2);
+            loadingPane.getChildren().clear();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // End of loading screen code...................
+        
         // Allows the menu to have just one item and also fire
         searchItem.getItems().add(new MenuItem());
         searchItem.addEventHandler(Menu.ON_SHOWN, event -> searchItem.hide());
@@ -89,12 +112,10 @@ public class Main extends Application {
         });*/
         centerPane.setLeft(videoList);
 
-
         mainPane.setTop(menuBar);
         mainPane.setCenter(centerPane);
         mainScene = new Scene(mainPane,500,200);
         primaryStage.setScene(mainScene);
         primaryStage.show();
-
     }
 }
