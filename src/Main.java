@@ -38,7 +38,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         centerPane = new BorderPane();
         mainPane = new BorderPane();
-        searchField = new TextField("Enter your search query here");
+        searchField = new TextField();
+        searchField.setPromptText("Enter your search query here");
         menuBar = new MenuBar();
         loginItem = new Menu("Login");
         searchItem = new Menu("Search");
@@ -48,7 +49,13 @@ public class Main extends Application {
         searchItem.getItems().add(new MenuItem());
         searchItem.addEventHandler(Menu.ON_SHOWN, event -> searchItem.hide());
         searchItem.addEventHandler(Menu.ON_SHOWING, event -> searchItem.fire());
-        searchItem.setOnAction(e -> centerPane.setTop(searchField));
+        searchItem.setOnAction(e -> {
+            if(centerPane.getTop() == searchField){
+                centerPane.getChildren().remove(searchField);
+            } else {
+                centerPane.setTop(searchField);
+            }
+        });
 
         quitItem.getItems().add(new MenuItem());
         quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
@@ -105,6 +112,8 @@ public class Main extends Application {
             logoStage.close();
             primaryStage.setScene(mainScene);
             primaryStage.initStyle(StageStyle.DECORATED);
+            primaryStage.getIcons().add(new Image("https://cdn1.iconfinder.com/data/icons/logotypes/32/youtube-256.png"));
+            primaryStage.setTitle("YT Companion");
             primaryStage.show();
         });
         pause.play();
