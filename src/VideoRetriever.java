@@ -52,7 +52,7 @@ public class VideoRetriever {
                     String videoID = idData.getString("videoId");
 
                     videos.add(new Video(title, thumbnail, videoID));
-                    System.out.printf("Found: %s  (%s) (%s) \n", title, videoID, thumbnail);
+                    //System.out.printf("Found: %s  (%s) (%s) \n", title, videoID, thumbnail);
                 }
             }
 

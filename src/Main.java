@@ -16,6 +16,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+
 public class Main extends Application {
 
     private Scene mainScene;
@@ -25,8 +27,18 @@ public class Main extends Application {
     private MenuBar menuBar;
     private Menu searchItem;
     private Menu quitItem;
+    private Menu searchHistItem;
+    private Menu videoHistoryItem;
+    private ListView<String> videoHistList;
+
+
+    private ListView<String> historyList;
     private ListView<Video> videoList;
     private WebView webview;
+
+    // Instance for keeping track of the search history
+    private SearchHistory searchH;
+    private SearchHistory videoH;
 
     public static void main(String[] args) {
         launch(args);
@@ -41,6 +53,14 @@ public class Main extends Application {
         menuBar = new MenuBar();
         searchItem = new Menu("Search");
         quitItem = new Menu("Quit");
+        searchHistItem = new Menu("Search History");
+        videoHistoryItem = new Menu("Video History");
+
+        //File to store searchs
+        File SearchH = new File("Search History.txt");
+        File VideoH = new File("File History.txt");
+        searchH = new SearchHistory(SearchH);
+        videoH = new SearchHistory(VideoH);
 
         // Allows the menu to have just one item and also fire
         searchItem.getItems().add(new MenuItem());
@@ -59,6 +79,30 @@ public class Main extends Application {
         quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
         quitItem.setOnAction(e -> System.exit(0));
 
+        searchHistItem.getItems().add(new MenuItem());
+        searchHistItem.addEventHandler(Menu.ON_SHOWN, event -> searchHistItem.hide());
+        searchHistItem.addEventHandler(Menu.ON_SHOWING, event -> searchHistItem.fire());
+        searchHistItem.setOnAction(e -> {
+            if(centerPane.getTop() == historyList){
+                centerPane.getChildren().remove(historyList);
+            }else{
+                historyList.setItems(searchH.getSearchs());
+                centerPane.setTop(historyList);
+            }
+        });
+
+        videoHistoryItem.getItems().add(new MenuItem());
+        videoHistoryItem.addEventHandler(Menu.ON_SHOWN, event -> videoHistoryItem.hide());
+        videoHistoryItem.addEventHandler(Menu.ON_SHOWING, event -> videoHistoryItem.fire());
+        videoHistoryItem.setOnAction(e -> {
+            if(centerPane.getTop() == videoHistList){
+                centerPane.getChildren().remove(videoHistList);
+            }else{
+                videoHistList.setItems(videoH.getSearchs());
+                centerPane.setTop(videoHistList);
+            }
+        });
+
 
         // Code for the search box to display or hide properly
         searchField.setOnKeyPressed((event) -> {
@@ -69,17 +113,33 @@ public class Main extends Application {
                         query = query.substring(0, query.indexOf(' ')) + "%20" +  query.substring(query.indexOf(' ') + 1, query.length());
                     }
 
+                    searchH.trackSearchHistory(query);
+
                     videoList.setItems(FXCollections.observableList(VideoRetriever.getVideos(query)));
                 }
                 centerPane.getChildren().remove(searchField);
             }
         });
 
-        menuBar.getMenus().addAll(searchItem, quitItem);
+        menuBar.getMenus().addAll(searchItem, searchHistItem, videoHistoryItem, quitItem);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        videoHistList = new ListView<>();
+        videoHistList.setItems(FXCollections.observableArrayList());
+
+        historyList = new ListView<>();
+        historyList.setItems(FXCollections.observableArrayList());
 
         videoList = new ListView<>();
         videoList.setItems(FXCollections.observableArrayList());
+
+        videoHistList.setOnMouseClicked(e -> {
+            String selection = videoHistList.getSelectionModel().getSelectedItem();
+            String splitter[] = selection.split("\t");
+            webview.getEngine().load(splitter[1]);
+            centerPane.getChildren().remove(videoHistList);
+        });
+
         // Placing videos onto ListView
         videoList.setCellFactory(param -> new ListCell<Video>() {
             private ImageView imageView = new ImageView();
@@ -100,6 +160,8 @@ public class Main extends Application {
             System.out.println(videoList.getSelectionModel().getSelectedItem());
             if (videoList.getSelectionModel().getSelectedItem() != null) {
                 System.out.println(videoList.getSelectionModel().getSelectedItem().getVideoURL());
+                videoH.trackSearchHistory(videoList.getSelectionModel().getSelectedItem().getTitle()+'\t'+
+                                             videoList.getSelectionModel().getSelectedItem().getVideoURL());
                 webview.getEngine().load(
                         videoList.getSelectionModel().getSelectedItem().getVideoURL()
                 );
