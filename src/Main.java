@@ -100,7 +100,7 @@ public class Main extends Application {
                 );
             }
         });
-        
+
         centerPane.setLeft(videoList);
         centerPane.setRight(webview);
 
