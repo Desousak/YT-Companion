@@ -1,21 +1,21 @@
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.*;
-import java.net.*;
-
-import com.google.api.services.youtube.model.Thumbnail;
-import javafx.scene.Scene;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
-import org.json.*;
-import com.google.api.services.youtube.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 
 public class VideoRetriver {
-    public static void main(String[] args) {
+    public static ArrayList<Video> getVideos(String keyword) {
+        ArrayList<Video> videos = new ArrayList<>();
         try {
             String apiKey = "AIzaSyA2rJ3kuns7kM0B-qLeGl6-BLpM_9whQr0";
-            String keyword = "fortnite";
+            int maxResults = 50;
             String url = "https://www.googleapis.com/youtube/v3/search" +
-                    "?part=id%2Csnippet&q=" + keyword + "&key=" + apiKey ;
+                    "?part=id%2Csnippet&q=" + keyword + "&key=" + apiKey + "&maxResults=" + maxResults;
             URL netURL = new URL(url);
 
             URLConnection conn = netURL.openConnection();
@@ -27,15 +27,14 @@ public class VideoRetriver {
                     new InputStreamReader(inStream)
             );
 
-            System.out.println(url);
-
             StringBuffer buffer = new StringBuffer();
             String line;
             while ((line = in.readLine()) != null) {
                 buffer.append(line);
             }
-            String jsonData = buffer.toString();
 
+
+            String jsonData = buffer.toString();
             JSONObject data = new JSONObject(jsonData);
             JSONArray items = data.getJSONArray("items");
             for (int i = 0; i < items.length(); i++) {
@@ -45,25 +44,26 @@ public class VideoRetriver {
 
                 if (kind.equals("youtube#video") || kind.equals("youtube#searchResult")) {
                     JSONObject snippet = item.getJSONObject("snippet");
+                    JSONObject thumbnailData = snippet.getJSONObject("thumbnails").getJSONObject("default");
                     JSONObject idData = item.getJSONObject("id");
-//                    JSONObject thumbnails = item.getJSONObject("thumbnails");
 
                     String title = snippet.getString("title");
-
+                    String thumbnail = thumbnailData.getString("url");
                     String videoID = idData.getString("videoId");
-                    Thumbnail thumbnail = snippet.thumbnails;
 
-                        System.out.printf("Found: %s  (%s) (%s) \n", title, videoID, thumbnail);
+                    videos.add(new Video(title, thumbnail, videoID));
+                    System.out.printf("Found: %s  (%s) (%s) \n", title, videoID, thumbnail);
                 }
 
 
             }
 
-            inStream.close();
 
+            inStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return videos;
     }
 }
 
