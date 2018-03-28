@@ -64,7 +64,12 @@ public class Main extends Application {
         searchField.setOnKeyPressed((event) -> {
             if (event.getCode() == KeyCode.ESCAPE || event.getCode() == KeyCode.ENTER) {
                 if (!searchField.getText().equals("") && event.getCode() == KeyCode.ENTER) {
-                    videoList.setItems(FXCollections.observableList(VideoRetriever.getVideos(searchField.getText())));
+                    String query = searchField.getText();
+                    while (query.contains(" ")){
+                        query = query.substring(0, query.indexOf(' ')) + "%20" +  query.substring(query.indexOf(' ') + 1, query.length());
+                    }
+
+                    videoList.setItems(FXCollections.observableList(VideoRetriever.getVideos(query)));
                 }
                 centerPane.getChildren().remove(searchField);
             }
