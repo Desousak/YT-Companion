@@ -29,12 +29,15 @@ public class Main extends Application {
     private Menu quitItem;
     private Menu searchHistItem;
     private Menu videoHistoryItem;
+    private Menu nightModeItem;
     private ListView<String> videoHistList;
-
-
     private ListView<String> historyList;
     private ListView<Video> videoList;
     private WebView webview;
+    private Image blackScreen;
+    private ImageView blackScreenView;
+    private Boolean nightModeOn = false;
+    private Boolean videoOn = false;
 
     // Instance for keeping track of the search history
     private SearchHistory searchH;
@@ -53,10 +56,11 @@ public class Main extends Application {
         menuBar = new MenuBar();
         searchItem = new Menu("Search");
         quitItem = new Menu("Quit");
+        nightModeItem = new Menu("Night Mode");
         searchHistItem = new Menu("Search History");
         videoHistoryItem = new Menu("Video History");
 
-        //File to store searchs
+        //File to store searches
         File SearchH = new File("Search History.txt");
         File VideoH = new File("File History.txt");
         searchH = new SearchHistory(SearchH);
@@ -74,18 +78,13 @@ public class Main extends Application {
             }
         });
 
-        quitItem.getItems().add(new MenuItem());
-        quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
-        quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
-        quitItem.setOnAction(e -> System.exit(0));
-
         searchHistItem.getItems().add(new MenuItem());
         searchHistItem.addEventHandler(Menu.ON_SHOWN, event -> searchHistItem.hide());
         searchHistItem.addEventHandler(Menu.ON_SHOWING, event -> searchHistItem.fire());
         searchHistItem.setOnAction(e -> {
             if(centerPane.getTop() == historyList){
                 centerPane.getChildren().remove(historyList);
-            }else{
+            } else {
                 historyList.setItems(searchH.getSearchs());
                 centerPane.setTop(historyList);
             }
@@ -97,12 +96,36 @@ public class Main extends Application {
         videoHistoryItem.setOnAction(e -> {
             if(centerPane.getTop() == videoHistList){
                 centerPane.getChildren().remove(videoHistList);
-            }else{
+            } else {
                 videoHistList.setItems(videoH.getSearchs());
                 centerPane.setTop(videoHistList);
             }
         });
 
+        nightModeItem.getItems().add(new MenuItem());
+        nightModeItem.addEventHandler(Menu.ON_SHOWN, event -> nightModeItem.hide());
+        nightModeItem.addEventHandler(Menu.ON_SHOWING, event -> nightModeItem.fire());
+        nightModeItem.setOnAction(e -> {
+            if (nightModeOn == false) {
+                nightModeOn = true;
+                if (videoOn == false) {
+                    blackScreen = new Image("file:images/Black.png");
+                    blackScreenView = new ImageView();
+                    blackScreenView.setImage(blackScreen);
+                    centerPane.setRight(blackScreenView);
+                }
+                mainScene.getStylesheets().add("NightMode.css");
+            } else if (nightModeOn == true) {
+                nightModeOn = false;
+                centerPane.setRight(webview);
+                mainScene.getStylesheets().clear();
+            }
+        });
+
+        quitItem.getItems().add(new MenuItem());
+        quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
+        quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
+        quitItem.setOnAction(e -> System.exit(0));
 
         // Code for the search box to display or hide properly
         searchField.setOnKeyPressed((event) -> {
@@ -121,7 +144,7 @@ public class Main extends Application {
             }
         });
 
-        menuBar.getMenus().addAll(searchItem, searchHistItem, videoHistoryItem, quitItem);
+        menuBar.getMenus().addAll(searchItem, searchHistItem, videoHistoryItem, nightModeItem, quitItem);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         videoHistList = new ListView<>();
@@ -171,7 +194,16 @@ public class Main extends Application {
 
         });
         videoList.setOnMouseClicked(e -> {
+            videoOn = true;
             System.out.println(videoList.getSelectionModel().getSelectedItem());
+            // If nightMode's on remove the black screen "curtain"
+            if (nightModeOn == true) {
+                centerPane.getChildren().remove(blackScreenView);
+                centerPane.setRight(webview);
+            }
+
+            centerPane.setRight(webview);
+
             if (videoList.getSelectionModel().getSelectedItem() != null) {
                 System.out.println(videoList.getSelectionModel().getSelectedItem().getVideoURL());
                 videoH.trackSearchHistory(videoList.getSelectionModel().getSelectedItem().getTitle()+'\t'+
@@ -183,7 +215,6 @@ public class Main extends Application {
         });
 
         centerPane.setLeft(videoList);
-        centerPane.setRight(webview);
 
         mainPane.setTop(menuBar);
         mainPane.setCenter(centerPane);
