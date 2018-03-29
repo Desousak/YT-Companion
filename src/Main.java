@@ -79,6 +79,7 @@ public class Main extends Application {
         quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
         quitItem.setOnAction(e -> System.exit(0));
 
+        //Allowing menu item to autohide and act as a button
         searchHistItem.getItems().add(new MenuItem());
         searchHistItem.addEventHandler(Menu.ON_SHOWN, event -> searchHistItem.hide());
         searchHistItem.addEventHandler(Menu.ON_SHOWING, event -> searchHistItem.fire());
@@ -90,7 +91,7 @@ public class Main extends Application {
                 centerPane.setTop(historyList);
             }
         });
-
+        //Allowing menu item to autohide and act as a button
         videoHistoryItem.getItems().add(new MenuItem());
         videoHistoryItem.addEventHandler(Menu.ON_SHOWN, event -> videoHistoryItem.hide());
         videoHistoryItem.addEventHandler(Menu.ON_SHOWING, event -> videoHistoryItem.fire());
@@ -156,6 +157,7 @@ public class Main extends Application {
             }
 
         });
+
         videoList.setOnMouseClicked(e -> {
             System.out.println(videoList.getSelectionModel().getSelectedItem());
             if (videoList.getSelectionModel().getSelectedItem() != null) {
