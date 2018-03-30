@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.FileReader;
 
 public class Main extends Application {
 
@@ -29,12 +30,15 @@ public class Main extends Application {
     private Menu quitItem;
     private Menu searchHistItem;
     private Menu videoHistoryItem;
+    private Menu nightModeItem;
     private ListView<String> videoHistList;
-
-
     private ListView<String> historyList;
     private ListView<Video> videoList;
     private WebView webview;
+    private Image blackScreen;
+    private ImageView blackScreenView;
+    private Boolean nightModeOn = false;
+    private Boolean videoOn = false;
 
     // Instance for keeping track of the search history
     private SearchHistory searchH;
@@ -53,14 +57,20 @@ public class Main extends Application {
         menuBar = new MenuBar();
         searchItem = new Menu("Search");
         quitItem = new Menu("Quit");
+        nightModeItem = new Menu("Night Mode");
         searchHistItem = new Menu("Search History");
         videoHistoryItem = new Menu("Video History");
 
-        //File to store searchs
-        File SearchH = new File("Search History.txt");
-        File VideoH = new File("File History.txt");
-        searchH = new SearchHistory(SearchH);
-        videoH = new SearchHistory(VideoH);
+        //File to store searches
+        File SearchHFile = new File("Search History.txt");
+        File VideoHFile = new File("File History.txt");
+
+        searchH = new SearchHistory(SearchHFile);
+        videoH = new SearchHistory(VideoHFile);
+
+
+        searchH.setSearchs();
+        videoH.setSearchs();
 
         // Allows the menu to have just one item and also fire
         searchItem.getItems().add(new MenuItem());
@@ -74,19 +84,13 @@ public class Main extends Application {
             }
         });
 
-        quitItem.getItems().add(new MenuItem());
-        quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
-        quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
-        quitItem.setOnAction(e -> System.exit(0));
-
-        //Allowing menu item to autohide and act as a button
         searchHistItem.getItems().add(new MenuItem());
         searchHistItem.addEventHandler(Menu.ON_SHOWN, event -> searchHistItem.hide());
         searchHistItem.addEventHandler(Menu.ON_SHOWING, event -> searchHistItem.fire());
         searchHistItem.setOnAction(e -> {
             if(centerPane.getTop() == historyList){
                 centerPane.getChildren().remove(historyList);
-            }else{
+            } else {
                 historyList.setItems(searchH.getSearchs());
                 centerPane.setTop(historyList);
             }
@@ -98,12 +102,36 @@ public class Main extends Application {
         videoHistoryItem.setOnAction(e -> {
             if(centerPane.getTop() == videoHistList){
                 centerPane.getChildren().remove(videoHistList);
-            }else{
+            } else {
                 videoHistList.setItems(videoH.getSearchs());
                 centerPane.setTop(videoHistList);
             }
         });
 
+        nightModeItem.getItems().add(new MenuItem());
+        nightModeItem.addEventHandler(Menu.ON_SHOWN, event -> nightModeItem.hide());
+        nightModeItem.addEventHandler(Menu.ON_SHOWING, event -> nightModeItem.fire());
+        nightModeItem.setOnAction(e -> {
+            if (nightModeOn == false) {
+                nightModeOn = true;
+                if (videoOn == false) {
+                    blackScreen = new Image("file:images/Black.png");
+                    blackScreenView = new ImageView();
+                    blackScreenView.setImage(blackScreen);
+                    centerPane.setRight(blackScreenView);
+                }
+                mainScene.getStylesheets().add("NightMode.css");
+            } else if (nightModeOn == true) {
+                nightModeOn = false;
+                centerPane.setRight(webview);
+                mainScene.getStylesheets().clear();
+            }
+        });
+
+        quitItem.getItems().add(new MenuItem());
+        quitItem.addEventHandler(Menu.ON_SHOWN, event -> quitItem.hide());
+        quitItem.addEventHandler(Menu.ON_SHOWING, event -> quitItem.fire());
+        quitItem.setOnAction(e -> System.exit(0));
 
         // Code for the search box to display or hide properly
         searchField.setOnKeyPressed((event) -> {
@@ -122,7 +150,7 @@ public class Main extends Application {
             }
         });
 
-        menuBar.getMenus().addAll(searchItem, searchHistItem, videoHistoryItem, quitItem);
+        menuBar.getMenus().addAll(searchItem, searchHistItem, videoHistoryItem, nightModeItem, quitItem);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         videoHistList = new ListView<>();
@@ -141,6 +169,13 @@ public class Main extends Application {
             centerPane.getChildren().remove(videoHistList);
         });
 
+        historyList.setOnMouseClicked(e -> {
+            String selection = historyList.getSelectionModel().getSelectedItem();
+            centerPane.getChildren().remove(historyList);
+            searchField.setText(selection);
+            centerPane.setTop(searchField);
+        });
+
         // Placing videos onto ListView
         videoList.setCellFactory(param -> new ListCell<Video>() {
             private ImageView imageView = new ImageView();
@@ -151,7 +186,21 @@ public class Main extends Application {
                     setGraphic(null);
                 } else {
                     imageView.setImage(new Image(video.getThumbnailURL()));
-                    setText(video.getTitle());
+                    imageView.setImage(new Image(video.getThumbnailURL()));
+                    // Getting the title of the video to "wrap" in the ListView
+                    String title = video.getTitle();
+                    int listViewBuffer = 10;
+                    int lastSpace = 0;
+                    for (int i = 0; i < title.length(); i++) {
+                        if (title.charAt(i) == ' ') {
+                            lastSpace = i;
+                        }
+                        if (i != 0 && i % listViewBuffer == 0) {
+                            title = title.substring(0, lastSpace) + '\n' + title.substring(lastSpace + 1, title.length());
+                        }
+                    }
+
+                    setText(title);
                     setGraphic(imageView);
                 }
             }
@@ -159,7 +208,16 @@ public class Main extends Application {
         });
 
         videoList.setOnMouseClicked(e -> {
+            videoOn = true;
             System.out.println(videoList.getSelectionModel().getSelectedItem());
+            // If nightMode's on remove the black screen "curtain"
+            if (nightModeOn == true) {
+                centerPane.getChildren().remove(blackScreenView);
+                centerPane.setRight(webview);
+            }
+
+            centerPane.setRight(webview);
+
             if (videoList.getSelectionModel().getSelectedItem() != null) {
                 System.out.println(videoList.getSelectionModel().getSelectedItem().getVideoURL());
                 videoH.trackSearchHistory(videoList.getSelectionModel().getSelectedItem().getTitle()+'\t'+
@@ -171,7 +229,6 @@ public class Main extends Application {
         });
 
         centerPane.setLeft(videoList);
-        centerPane.setRight(webview);
 
         mainPane.setTop(menuBar);
         mainPane.setCenter(centerPane);
