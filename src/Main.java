@@ -172,8 +172,7 @@ public class Main extends Application {
         historyList.setOnMouseClicked(e -> {
             String selection = historyList.getSelectionModel().getSelectedItem();
             centerPane.getChildren().remove(historyList);
-            searchField.setText(selection);
-            centerPane.setTop(searchField);
+            videoList.setItems(FXCollections.observableList(VideoRetriever.getVideos(selection)));
         });
 
         // Placing videos onto ListView
