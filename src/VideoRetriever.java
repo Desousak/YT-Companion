@@ -1,14 +1,34 @@
+import javafx.collections.FXCollections;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.swing.text.html.ListView;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-public class VideoRetriever {
+import javafx.scene.control.*;
+
+public class VideoRetriever extends Thread {
+    private ArrayList<Video> list;
+    private String query;
+
+    public VideoRetriever(String query){
+        this.query = query;
+    }
+
+    public void run(){
+        list = (VideoRetriever.getVideos(query));
+    }
+
+    public ArrayList<Video> getList(){
+        return list;
+    }
+
     public static ArrayList<Video> getVideos(String keyword) {
         ArrayList<Video> videos = new ArrayList<>();
         try {
@@ -63,4 +83,3 @@ public class VideoRetriever {
         return videos;
     }
 }
-

@@ -1,5 +1,6 @@
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -17,7 +18,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.io.FileReader;
+import java.util.List;
 
 public class Main extends Application {
 
@@ -88,7 +89,7 @@ public class Main extends Application {
         searchHistItem.addEventHandler(Menu.ON_SHOWN, event -> searchHistItem.hide());
         searchHistItem.addEventHandler(Menu.ON_SHOWING, event -> searchHistItem.fire());
         searchHistItem.setOnAction(e -> {
-            if(centerPane.getTop() == historyList){
+            if (centerPane.getTop() == historyList) {
                 centerPane.getChildren().remove(historyList);
             } else {
                 historyList.setItems(searchH.getSearchs());
@@ -100,7 +101,7 @@ public class Main extends Application {
         videoHistoryItem.addEventHandler(Menu.ON_SHOWN, event -> videoHistoryItem.hide());
         videoHistoryItem.addEventHandler(Menu.ON_SHOWING, event -> videoHistoryItem.fire());
         videoHistoryItem.setOnAction(e -> {
-            if(centerPane.getTop() == videoHistList){
+            if (centerPane.getTop() == videoHistList) {
                 centerPane.getChildren().remove(videoHistList);
             } else {
                 videoHistList.setItems(videoH.getSearchs());
@@ -138,13 +139,24 @@ public class Main extends Application {
             if (event.getCode() == KeyCode.ESCAPE || event.getCode() == KeyCode.ENTER) {
                 if (!searchField.getText().equals("") && event.getCode() == KeyCode.ENTER) {
                     String query = searchField.getText();
-                    while (query.contains(" ")){
-                        query = query.substring(0, query.indexOf(' ')) + "%20" +  query.substring(query.indexOf(' ') + 1, query.length());
+                    while (query.contains(" ")) {
+                        query = query.substring(0, query.indexOf(' ')) + "%20" + query.substring(query.indexOf(' ') + 1, query.length());
                     }
 
                     searchH.trackSearchHistory(query);
 
-                    videoList.setItems(FXCollections.observableList(VideoRetriever.getVideos(query)));
+                    try {
+                        VideoRetriever rt = new VideoRetriever(query);
+                        rt.start();
+                        rt.join();
+                        Platform.runLater(new Runnable() {
+                            public void run() {
+                                videoList.setItems(FXCollections.observableList(rt.getList()));
+                            }
+                        });
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
                 centerPane.getChildren().remove(searchField);
             }
@@ -161,11 +173,13 @@ public class Main extends Application {
 
         videoList = new ListView<>();
         videoList.setItems(FXCollections.observableArrayList());
+        videoList.setCache(true);
 
         videoHistList.setOnMouseClicked(e -> {
             String selection = videoHistList.getSelectionModel().getSelectedItem();
             String splitter[] = selection.split("\t");
 
+            videoOn = true;
             centerPane.setRight(webview);
             webview.getEngine().load(splitter[1]);
             centerPane.getChildren().remove(videoHistList);
@@ -174,12 +188,25 @@ public class Main extends Application {
         historyList.setOnMouseClicked(e -> {
             String selection = historyList.getSelectionModel().getSelectedItem();
             centerPane.getChildren().remove(historyList);
-            videoList.setItems(FXCollections.observableList(VideoRetriever.getVideos(selection)));
+
+            try {
+                VideoRetriever rt = new VideoRetriever(selection);
+                rt.start();
+                rt.join();
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        videoList.setItems(FXCollections.observableList(rt.getList()));
+                    }
+                });
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
         });
 
         // Placing videos onto ListView
         videoList.setCellFactory(param -> new ListCell<Video>() {
             private ImageView imageView = new ImageView();
+
             public void updateItem(Video video, boolean empty) {
                 super.updateItem(video, empty);
                 if (empty) {
@@ -221,8 +248,8 @@ public class Main extends Application {
 
             if (videoList.getSelectionModel().getSelectedItem() != null) {
                 System.out.println(videoList.getSelectionModel().getSelectedItem().getVideoURL());
-                videoH.trackSearchHistory(videoList.getSelectionModel().getSelectedItem().getTitle()+'\t'+
-                                             videoList.getSelectionModel().getSelectedItem().getVideoURL());
+                videoH.trackSearchHistory(videoList.getSelectionModel().getSelectedItem().getTitle() + '\t' +
+                        videoList.getSelectionModel().getSelectedItem().getVideoURL());
                 webview.getEngine().load(
                         videoList.getSelectionModel().getSelectedItem().getVideoURL()
                 );
