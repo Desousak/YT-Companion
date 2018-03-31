@@ -165,6 +165,8 @@ public class Main extends Application {
         videoHistList.setOnMouseClicked(e -> {
             String selection = videoHistList.getSelectionModel().getSelectedItem();
             String splitter[] = selection.split("\t");
+
+            centerPane.setRight(webview);
             webview.getEngine().load(splitter[1]);
             centerPane.getChildren().remove(videoHistList);
         });
