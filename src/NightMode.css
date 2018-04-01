@@ -47,8 +47,3 @@
 .scroll-bar .thumb, .corner {
     -fx-background-color: #101010;
 }
-
-/*Entire scene*/
-.root {
-    -fx-background-color: #000000;
-}
