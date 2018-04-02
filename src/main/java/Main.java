@@ -50,6 +50,7 @@ public class Main extends Application {
     }
 
     public void start(Stage primaryStage) {
+        // UI elements
         centerPane = new BorderPane();
         mainPane = new BorderPane();
         searchField = new TextField();
@@ -62,13 +63,12 @@ public class Main extends Application {
         searchHistItem = new Menu("Search History");
         videoHistoryItem = new Menu("Video History");
 
-        //File to store searches
+        // File to store searches
         File SearchHFile = new File("Search History.txt");
         File VideoHFile = new File("Video History.txt");
-
+        
         searchH = new SearchHistory(SearchHFile);
         videoH = new SearchHistory(VideoHFile);
-
         searchH.setSearchs();
         videoH.setSearchs();
 
@@ -84,6 +84,7 @@ public class Main extends Application {
             }
         });
 
+        // Allowing menu item to autohide and act as a button
         searchHistItem.getItems().add(new MenuItem());
         searchHistItem.addEventHandler(Menu.ON_SHOWN, event -> searchHistItem.hide());
         searchHistItem.addEventHandler(Menu.ON_SHOWING, event -> searchHistItem.fire());
@@ -96,7 +97,6 @@ public class Main extends Application {
             }
         });
         
-        //Allowing menu item to autohide and act as a button
         videoHistoryItem.getItems().add(new MenuItem());
         videoHistoryItem.addEventHandler(Menu.ON_SHOWN, event -> videoHistoryItem.hide());
         videoHistoryItem.addEventHandler(Menu.ON_SHOWING, event -> videoHistoryItem.fire());
@@ -217,6 +217,7 @@ public class Main extends Application {
                 } else {
                     imageView.setImage(new Image(video.getThumbnailURL()));
                     imageView.setImage(new Image(video.getThumbnailURL()));
+                    
                     // Getting the title of the video to "wrap" in the ListView
                     String title = video.getTitle();
                     int listViewBuffer = 10;
@@ -259,7 +260,6 @@ public class Main extends Application {
         });
 
         centerPane.setLeft(videoList);
-
         mainPane.setTop(menuBar);
         mainPane.setCenter(centerPane);
         mainScene = new Scene(mainPane, 1050, 500);
