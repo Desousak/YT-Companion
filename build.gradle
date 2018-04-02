@@ -1,11 +1,11 @@
+group 'CSCI2020U'
+version '1.0'
+
 apply plugin: 'java'
 
 repositories {
     mavenCentral()
 }
-
-version = '1.0'
-sourceCompatibility = JavaVersion.VERSION_1_9
 
 dependencies {
     // https://mvnrepository.com/artifact/org.json/json
@@ -14,8 +14,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'main.java.csci2020u.ytcompanion.Main',
-                "Implementation-Version": version
+        attributes 'Main-Class': 'Main'
     }
     from configurations.runtime.collect { zipTree(it) }
 
