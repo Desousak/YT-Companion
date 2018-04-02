@@ -13,8 +13,16 @@ https://github.com/Desousak/YT-Companion
 
 4) Leonard Zbona  (ZbonaL): JSON (Sockets), gradle file, and code optimization.  
 
+# Build Tools and Versions Used:  
+Java - Version 9  
+Gradle - Version 4.6  
+
 # Instructions to run:  
 Clone the repository and use the following commands in a terminal:  
+```
 gradle dependencies  
 gradle build  
 gradle run  
+```
+
+
