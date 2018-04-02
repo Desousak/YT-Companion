@@ -64,11 +64,10 @@ public class Main extends Application {
 
         //File to store searches
         File SearchHFile = new File("Search History.txt");
-        File VideoHFile = new File("File History.txt");
+        File VideoHFile = new File("Video History.txt");
 
         searchH = new SearchHistory(SearchHFile);
         videoH = new SearchHistory(VideoHFile);
-
 
         searchH.setSearchs();
         videoH.setSearchs();
@@ -96,6 +95,7 @@ public class Main extends Application {
                 centerPane.setTop(historyList);
             }
         });
+        
         //Allowing menu item to autohide and act as a button
         videoHistoryItem.getItems().add(new MenuItem());
         videoHistoryItem.addEventHandler(Menu.ON_SHOWN, event -> videoHistoryItem.hide());
