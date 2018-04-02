@@ -109,6 +109,7 @@ public class Main extends Application {
             }
         });
 
+        // Creates the ability for the app to have a nightmode feature
         nightModeItem.getItems().add(new MenuItem());
         nightModeItem.addEventHandler(Menu.ON_SHOWN, event -> nightModeItem.hide());
         nightModeItem.addEventHandler(Menu.ON_SHOWING, event -> nightModeItem.fire());
@@ -162,6 +163,7 @@ public class Main extends Application {
             }
         });
 
+        // creates top menu bar and different buttons
         menuBar.getMenus().addAll(searchItem, searchHistItem, videoHistoryItem, nightModeItem, quitItem);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -184,7 +186,7 @@ public class Main extends Application {
             webview.getEngine().load(splitter[1]);
             centerPane.getChildren().remove(videoHistList);
         });
-
+        
         historyList.setOnMouseClicked(e -> {
             String selection = historyList.getSelectionModel().getSelectedItem();
             centerPane.getChildren().remove(historyList);

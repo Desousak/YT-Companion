@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SearchHistory {
+
+    /* This class keeps track of the users search and watched video history adn place data into a txt file*/
     private ObservableList<String> searchs = FXCollections.observableArrayList();
     private File searchRecorder;
 
@@ -14,6 +16,8 @@ public class SearchHistory {
         this.searchRecorder = file;
     }
 
+    // This function keeps track of the latest searches and watched videos
+    // and appends to an observable array list
     public void trackSearchHistory(String s) {
 
         try {
@@ -34,6 +38,7 @@ public class SearchHistory {
         return searchs;
     }
 
+    // Continuously adds the searches to the list
     public void setSearchs() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(searchRecorder));

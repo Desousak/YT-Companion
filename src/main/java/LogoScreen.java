@@ -8,8 +8,10 @@ import javafx.stage.StageStyle;
 
 public class LogoScreen extends Application {
 
+    /*This class creates and launches the start screen and image */
+
     private BorderPane loadingPane;
-    private Scene mainScene;
+        private Scene mainScene;
     private Image youTubeLogo;
     private ImageView imageLogoView;
 

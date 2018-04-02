@@ -1,9 +1,14 @@
 public class Video {
+    /*
+    * This class creates the embeded video link that is used to play the video
+    * */
+
     private String title;
     private String thumbnailURL;
     private String videoID;
 
     public Video(String title, String thumbnailURL, String videoID) {
+        // Get the video link properties from the Retriever class
         this.title = title;
         this.thumbnailURL = thumbnailURL;
         this.videoID = videoID;

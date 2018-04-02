@@ -14,6 +14,12 @@ import java.util.ArrayList;
 import javafx.scene.control.*;
 
 public class VideoRetriever extends Thread {
+
+    /*
+    * This class uses JSON Objects and the youtbe API to search for videos
+    * And break their properties like id, title and thumbnail link
+    * into usable properties to build embeded links
+    * */
     private ArrayList<Video> list;
     private String query;
 
@@ -53,7 +59,7 @@ public class VideoRetriever extends Thread {
                 buffer.append(line);
             }
 
-
+            // JSON objects that hold link properties from the form google api
             String jsonData = buffer.toString();
             JSONObject data = new JSONObject(jsonData);
             JSONArray items = data.getJSONArray("items");
