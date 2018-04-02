@@ -11,10 +11,10 @@ https://github.com/Desousak/YT-Companion
 
 3) Samuel Pilkey  (SPilkey): Search/Video history and File I/O.
 
-4) Leonard Zbona  (ZbonaL): JSON (Sockets), gradle file, and code optimization.
+4) Leonard Zbona  (ZbonaL): JSON (Sockets), gradle file, and code optimization.  
 
-# Instructions to run:
-Clone the repository and use the following commands in a terminal:
-gradle dependencies
-gradle build
-gradle run
+# Instructions to run:  
+Clone the repository and use the following commands in a terminal:  
+gradle dependencies  
+gradle build  
+gradle run  
