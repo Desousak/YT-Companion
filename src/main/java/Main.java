@@ -116,12 +116,12 @@ public class Main extends Application {
             if (nightModeOn == false) {
                 nightModeOn = true;
                 if (videoOn == false) {
-                    blackScreen = new Image("file:images/Black.png");
+                    blackScreen = new Image("res/Black.png");
                     blackScreenView = new ImageView();
                     blackScreenView.setImage(blackScreen);
                     centerPane.setRight(blackScreenView);
                 }
-                mainScene.getStylesheets().add("NightMode.css");
+                mainScene.getStylesheets().add("res/NightMode.css");
             } else if (nightModeOn == true) {
                 nightModeOn = false;
                 centerPane.setRight(webview);
@@ -272,7 +272,7 @@ public class Main extends Application {
             primaryStage.setResizable(false);
             logoStage.close();
             primaryStage.setScene(mainScene);
-            primaryStage.getIcons().add(new Image("file:images/icon.png"));
+            primaryStage.getIcons().add(new Image("res/icon.png"));
             primaryStage.setTitle("YT Companion");
             primaryStage.show();
         });

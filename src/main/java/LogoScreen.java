@@ -21,7 +21,7 @@ public class LogoScreen extends Application {
         loadingPane = new BorderPane();
 
         // Loading screen code
-        youTubeLogo = new Image("file:images/LogoLoadingButton.png",
+        youTubeLogo = new Image("res/LogoLoadingButton.png",
                 250, 250, true, true);
         imageLogoView = new ImageView();
         imageLogoView.setImage(youTubeLogo);
