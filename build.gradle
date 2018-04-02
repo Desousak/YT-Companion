@@ -1,0 +1,22 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+version = '1.0'
+sourceCompatibility = JavaVersion.VERSION_1_9
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.json/json
+    compile group: 'org.json', name: 'json', version: '20180130'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'main.java.csci2020u.ytcompanion.Main',
+                "Implementation-Version": version
+    }
+    from configurations.runtime.collect { zipTree(it) }
+
+}
